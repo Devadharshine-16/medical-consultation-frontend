@@ -1,5 +1,6 @@
 // src/pages/BookAppointment.jsx
 import { useState } from "react";
+import API from "../api";
 
 function BookAppointment() {
   const [form, setForm] = useState({

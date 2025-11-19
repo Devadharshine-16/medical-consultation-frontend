@@ -1,5 +1,5 @@
 import { useState } from "react";
-import API from "../utils/axios";
+import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
 function Register() {
@@ -9,114 +9,89 @@ function Register() {
     password: "",
     confirmPassword: "",
   });
+
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (form.password !== form.confirmPassword) {
       return setMessage("❌ Passwords do not match");
     }
+
     setIsLoading(true);
+
     try {
-      const res = await API.post("/auth/register", form);
+      await api.post("/auth/register", form);
       setMessage("✅ Registration successful!");
-      setTimeout(() => navigate("/login"), 1000);
+
+      setTimeout(() => navigate("/login"), 1200);
+
     } catch (err) {
       setMessage(err.response?.data?.msg || "❌ Error registering");
-    } finally {
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   return (
     <div className="login-container">
-      <div className="login-card glass fade-in-up">
-        <div className="login-header">
-          <h2>Create Your Account</h2>
-          <p>Join MediCare+ and start your health journey today</p>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label htmlFor="name">Full Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              placeholder="Enter your full name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              className="form-input"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Enter your email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="form-input"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Create a password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="form-input"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              placeholder="Confirm your password"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              required
-              className="form-input"
-            />
-          </div>
-          
-          <button
-            type="submit"
-            className={`btn ${isLoading ? 'loading' : ''}`}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Creating Account...' : 'Create Account'}
+      <div className="login-card glass">
+        <h2>Create Account</h2>
+
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={handleChange}
+            required
+          />
+
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+
+          <button disabled={isLoading}>
+            {isLoading ? "Creating..." : "Register"}
           </button>
         </form>
-        
-        {message && (
-          <div className={`message ${message.includes('✅') ? 'success' : 'error'}`}>
-            {message}
-          </div>
-        )}
-        
-        <div className="login-footer">
-          <p>Already have an account? <a href="/login" className="link">Sign in here</a></p>
-        </div>
+
+        {message && <p>{message}</p>}
+
+        <p>
+          Already have an account?  
+          <a href="/login">Login</a>
+        </p>
       </div>
     </div>
   );
